@@ -7,12 +7,14 @@ import (
 	"strings"
 )
 
-const sample = `3   4
+const sample = `
+3   4
 4   3
 2   5
 1   3
 3   9
-3   3`
+3   3
+`
 
 func main() {
 	lines := strings.Split(sample, "\n")
@@ -21,6 +23,10 @@ func main() {
 	right := []int{}
 	rightCount := map[int]int{}
 	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
 		parts := strings.Fields(line)
 		if len(parts) != 2 {
 			panic("could not parse input")
