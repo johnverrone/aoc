@@ -17,7 +17,6 @@ const sample = `3   4
 func main() {
 	lines := strings.Split(sample, "\n")
 
-	// part 1
 	left := []int{}
 	right := []int{}
 	rightCount := map[int]int{}
@@ -32,6 +31,7 @@ func main() {
 		rightCount[rv] = rightCount[rv] + 1
 	}
 
+	// part 1
 	// sort the lists
 	sort.Sort(sort.IntSlice(left))
 	sort.Sort(sort.IntSlice(right))
