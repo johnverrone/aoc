@@ -5,6 +5,8 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/johnverrone/aoc2024/util"
 )
 
 const sample = `
@@ -17,7 +19,8 @@ const sample = `
 `
 
 func main() {
-	lines := strings.Split(sample, "\n")
+	in := util.ParseInput(nil)
+	lines := strings.Split(in, "\n")
 
 	left := []int{}
 	right := []int{}
