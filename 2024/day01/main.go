@@ -19,7 +19,7 @@ const sample = `
 `
 
 func main() {
-	in := util.ParseInput(nil)
+	in := util.ParseInput("")
 	lines := strings.Split(in, "\n")
 
 	left := []int{}

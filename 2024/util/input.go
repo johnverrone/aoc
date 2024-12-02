@@ -7,13 +7,9 @@ import (
 	"strings"
 )
 
-type Opts struct {
-	UseSample string
-}
-
-func ParseInput(opts *Opts) string {
-	if opts != nil && opts.UseSample != "" {
-		return opts.UseSample
+func ParseInput(sample string) string {
+	if sample != "" {
+		return strings.TrimSpace(sample)
 	}
 
 	_, file, _, _ := runtime.Caller(1)
