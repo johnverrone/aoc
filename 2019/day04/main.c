@@ -27,8 +27,7 @@ int main() {
 }
 
 int is_valid(int val) {
-  //printf("currently checking: %d\n", val);
-  int two_digits = 0;
+  int two_digits = -1;
   int decreases = 0;
 
   int pprev = -1;
@@ -36,26 +35,22 @@ int is_valid(int val) {
   val /= 10;
   int curr = val % 10;
   while (val > 0) {
-    //printf("\tchecking val: %d and curr: %d and prev: %d and pprev: %d\n", val, curr, prev, pprev);
     if (curr > prev) {
-      //printf("\t\tdecreases %d -> %d\n", curr, prev);
       decreases = 1;
+      return 0;
     }
-    if (curr == prev) {
-      //printf("\t\ttwo digits %d and %d\n", curr, prev);
-      if (pprev >= 0 && curr != pprev) {
-        //printf("\t\tthree digits %d, %d, and %d\n", curr, prev, pprev);
-        two_digits = 1;
-      }
+    if (curr == prev && two_digits < 0) {
+      two_digits = curr;
+    }
+    if (curr == prev && curr == pprev && curr == two_digits) {
+      two_digits = -1;
     }
     val /= 10;
     pprev = prev;
     prev = curr;
     curr = val % 10;
   }
-  //printf("two_digits: %d, decreases: %d\n", two_digits, decreases);
-  if (two_digits == 1 && decreases == 0) {
-    //printf("valid password\n");
+  if (two_digits > 0 && decreases == 0) {
     return 1;
   }
   return 0;
