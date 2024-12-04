@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"regexp"
 	"strconv"
 	"strings"
 
@@ -22,10 +21,9 @@ MAMMMXMMMM
 MXMXAXMASX
 `
 
-var re = regexp.MustCompile("XMAS|SAMX")
-
 func main() {
-	in := util.ParseInput(sample)
+	in := util.ParseInput("")
+	in = strings.TrimSpace(in)
 
 	// part 1
 	words := []string{}
@@ -48,7 +46,6 @@ func main() {
 	lDiag := map[string]string{}
 	for r := 0; r < len(rows); r++ {
 		for c := 0; c < len(rows[0]); c++ {
-			fmt.Printf("trying to find a home for %d, %d\n", r, c)
 			rStart := ""
 			lStart := ""
 			if r > c {
@@ -56,12 +53,13 @@ func main() {
 			} else {
 				rStart = "0," + strconv.Itoa(c-r)
 			}
-			if r > len(rows[0])-c {
-				lStart = strconv.Itoa(r+c) + ",0"
-			} else {
+			if r+c <= len(rows[0])-1 {
 				lStart = "0," + strconv.Itoa(r+c)
+			} else if c == len(rows[0])-1 {
+				lStart = strconv.Itoa(r) + "," + strconv.Itoa(c)
+			} else {
+				lStart = strconv.Itoa(r-(len(rows[0])-1-c)) + "," + strconv.Itoa(len(rows[0])-1)
 			}
-			fmt.Printf("\tright goes to %s and left goes to %s\n", rStart, lStart)
 			rDiag[rStart] += string(rows[r][c])
 			lDiag[lStart] += string(rows[r][c])
 		}
@@ -73,11 +71,10 @@ func main() {
 		words = append(words, v)
 	}
 
-	fmt.Println(len(words))
-
 	search := strings.Join(words, " ")
-	matches := re.FindAllStringIndex(search, -1)
-	fmt.Println("Part 1:", len(matches))
+	count := strings.Count(search, "XMAS")
+	count += strings.Count(search, "SAMX")
+	fmt.Println("Part 1:", count)
 
 	// part 2
 	// fmt.Println("Part 2:", sum)
