@@ -77,5 +77,15 @@ func main() {
 	fmt.Println("Part 1:", count)
 
 	// part 2
-	// fmt.Println("Part 2:", sum)
+	mas := 0
+	for r := 1; r < len(rows)-1; r++ {
+		for c := 1; c < len(rows[r])-1; c++ {
+			if rows[r][c] == 'A' {
+				if (rows[r-1][c-1] == 'M' && rows[r+1][c+1] == 'S' || rows[r-1][c-1] == 'S' && rows[r+1][c+1] == 'M') && (rows[r-1][c+1] == 'M' && rows[r+1][c-1] == 'S' || rows[r-1][c+1] == 'S' && rows[r+1][c-1] == 'M') {
+					mas++
+				}
+			}
+		}
+	}
+	fmt.Println("Part 2:", mas)
 }
