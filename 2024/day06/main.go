@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/johnverrone/aoc2024/util"
@@ -34,21 +35,25 @@ type point struct {
 }
 
 type Guard struct {
-	r, c    int
-	dir     Dir
-	m       []string
-	visited map[point]int
+	r, c      int
+	dir       Dir
+	m         []string
+	visited   map[point][]Dir
+	loopCount int
 }
 
 func NewGuard(r, c int, m []string) *Guard {
 	return &Guard{
-		r, c, UP, m, map[point]int{{r, c}: 1},
+		r, c, UP, m, map[point][]Dir{{r, c}: {UP}}, 0,
 	}
 }
 
 func (g *Guard) move() {
 	for {
 		for g.canMove() {
+			// fmt.Printf("can move %v at: %d, %d\n", g.dir, g.r, g.c)
+			//check if we can block
+			g.canBlock()
 			// move
 			switch g.dir {
 			case UP:
@@ -60,7 +65,7 @@ func (g *Guard) move() {
 			case DOWN:
 				g.r++
 			}
-			g.visited[point{g.r, g.c}] = 1
+			g.visited[point{g.r, g.c}] = append(g.visited[point{g.r, g.c}], g.dir)
 		}
 		// check bounds & turn
 		if (g.dir == UP && g.r == 0) || (g.dir == DOWN && g.r == len(g.m)-1) || (g.dir == RIGHT && g.c == len(g.m[0])-1) || (g.dir == LEFT && g.c == 0) {
@@ -71,6 +76,36 @@ func (g *Guard) move() {
 		} else {
 			g.dir++
 		}
+	}
+}
+
+func (g *Guard) canBlock() {
+	yes := false
+	switch g.dir {
+	case UP:
+		for i := 1; g.c+i < len(g.m[0])-1 && g.m[g.r][g.c+i] != '#'; i++ {
+			vDir, ok := g.visited[point{g.r, g.c + i}]
+			yes = ok && slices.Contains(vDir, RIGHT)
+		}
+	case LEFT:
+		for i := 1; g.r-i >= 0 && g.m[g.r-i][g.c] != '#'; i++ {
+			vDir, ok := g.visited[point{g.r - i, g.c}]
+			yes = ok && slices.Contains(vDir, UP)
+		}
+	case RIGHT:
+		for i := 1; g.r+i < len(g.m)-1 && g.m[g.r+i][g.c] != '#'; i++ {
+			vDir, ok := g.visited[point{g.r + 1, g.c}]
+			yes = ok && slices.Contains(vDir, DOWN)
+		}
+	case DOWN:
+		for i := 1; g.c-i >= 0 && g.m[g.r][g.c-1] != '#'; i++ {
+			vDir, ok := g.visited[point{g.r, g.c - 1}]
+			yes = ok && slices.Contains(vDir, LEFT)
+		}
+	}
+	if yes {
+		// fmt.Printf("can block move at: %d, %d\n", g.r, g.c)
+		g.loopCount++
 	}
 }
 
@@ -109,6 +144,6 @@ func main() {
 	fmt.Printf("Part 1: %d\n", len(g.visited))
 
 	// part 2
-	p2 := 0
-	fmt.Println("Part 2:", p2)
+	// fmt.Println(g.visited)
+	fmt.Println("Part 2:", g.loopCount)
 }
