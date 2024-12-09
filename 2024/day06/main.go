@@ -99,7 +99,6 @@ func (g *Guard) move() result {
 				g.loc.r++
 			}
 			// mark visited
-			// fmt.Printf("moving %s to %v\n", g.dir, g.loc)
 			g.visited[g.loc] = append(g.visited[g.loc], g.dir)
 		} else {
 			// turn
@@ -109,7 +108,6 @@ func (g *Guard) move() result {
 				g.dir++
 			}
 			// add turn direction to visited
-			// fmt.Printf("turning, adding %d to visited point at %d, %d\n", g.dir, newPoint.r, newPoint.c)
 			g.visited[g.loc] = append(g.visited[g.loc], g.dir)
 		}
 	}
@@ -174,7 +172,6 @@ func main() {
 	}
 
 	var g *Guard
-	fmt.Printf("starting loc %v\n", start)
 	g = NewGuard(start)
 	g.move()
 
