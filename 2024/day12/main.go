@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/johnverrone/aoc2024/util"
@@ -38,7 +39,7 @@ type plot struct {
 }
 
 func main() {
-	in := util.ParseInput(sample2)
+	in := util.ParseInput("")
 	lines := strings.Split(in, "\n")
 
 	farm := map[int][]plot{}
@@ -70,39 +71,52 @@ func main() {
 
 			// check if plot matches existing regions in the farm
 			if plotAbove != nil && plotAbove.plant == cur.plant && plotLeft != nil && plotLeft.plant == cur.plant {
-				// found match and left
+				// found match above and left
 				cur.region = plotAbove.region
-				fmt.Printf("found match above and left %d\n", perimeterMap[cur.region])
+				if plotLeft.region != plotAbove.region {
+					// reconcile regions
+					oldRegion := plotLeft.region
+					farm[cur.region] = append(farm[cur.region], farm[oldRegion]...)
+					delete(farm, oldRegion)
+					for i := 0; i < len(farm[cur.region]); i++ {
+						farm[cur.region][i].region = cur.region
+						perimeterMap[cur.region] += perimeterMap[oldRegion]
+						perimeterMap[oldRegion] = 0
+						regionLookup[farm[cur.region][i].p] = cur.region
+					}
+				}
 			} else if plotAbove != nil && plotAbove.plant == cur.plant {
 				// found match above
 				cur.region = plotAbove.region
 				perimeterMap[cur.region] += 2
-				fmt.Printf("found match above %d\n", perimeterMap[cur.region])
 			} else if plotLeft != nil && plotLeft.plant == cur.plant {
 				// found match left
 				cur.region = plotLeft.region
 				perimeterMap[cur.region] += 2
-				fmt.Printf("found match left %d\n", perimeterMap[cur.region])
 			} else {
 				// no matches
 				region++
 				cur.region = region
 				perimeterMap[cur.region] = 4
-				fmt.Printf("no matches, increasing region id %d, setting perimeter %d\n", cur.region, perimeterMap[cur.region])
 			}
-			fmt.Printf("appending cur %v\n", cur)
 			farm[cur.region] = append(farm[cur.region], cur)
 			regionLookup[cur.p] = cur.region
 		}
 	}
 
 	sum := 0
-	for i, r := range farm {
+	keys := make([]int, 0, len(farm))
+	for k := range farm {
+		keys = append(keys, k)
+	}
+	slices.Sort(keys)
+	for _, k := range keys {
+		r := farm[k]
 		area := len(r)
-		perimeter := perimeterMap[i]
+		perimeter := perimeterMap[k]
 		price := area * perimeter
 		sum += price
-		fmt.Printf("region %d (%c): %d * %d = %d\n", i, r[0].plant, area, perimeter, price)
+		// fmt.Printf("region %d (%c): %d * %d = %d\n", k, r[0].plant, area, perimeter, price)
 	}
 	fmt.Printf("%v\n", sum)
 }
