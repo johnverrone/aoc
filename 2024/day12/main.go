@@ -39,13 +39,14 @@ type plot struct {
 }
 
 func main() {
-	in := util.ParseInput("")
+	in := util.ParseInput(sample)
 	lines := strings.Split(in, "\n")
 
 	farm := map[int][]plot{}
 	regionLookup := map[pos]int{}
 	region := 0
 	perimeterMap := map[int]int{}
+	sideMap := map[int]int{}
 	for y := 0; y < len(lines); y++ {
 		for x := 0; x < len(lines[y]); x++ {
 			cur := plot{
@@ -98,6 +99,7 @@ func main() {
 				region++
 				cur.region = region
 				perimeterMap[cur.region] = 4
+				sideMap[cur.region] = 4
 			}
 			farm[cur.region] = append(farm[cur.region], cur)
 			regionLookup[cur.p] = cur.region
@@ -113,10 +115,12 @@ func main() {
 	for _, k := range keys {
 		r := farm[k]
 		area := len(r)
-		perimeter := perimeterMap[k]
-		price := area * perimeter
+		// perimeter := perimeterMap[k]
+		sides := sideMap[k]
+		price := area * sides
 		sum += price
 		// fmt.Printf("region %d (%c): %d * %d = %d\n", k, r[0].plant, area, perimeter, price)
+		fmt.Printf("region %d (%c): %d * %d = %d\n", k, r[0].plant, area, sides, price)
 	}
 	fmt.Printf("%v\n", sum)
 }
