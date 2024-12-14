@@ -21,5 +21,5 @@ func ParseInput(sample string) string {
 		log.Fatal(err)
 	}
 
-	return string(data)
+	return strings.TrimSpace(string(data))
 }
