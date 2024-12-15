@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/johnverrone/aoc2024/util"
-	"gonum.org/v1/gonum/mat"
 )
 
 const sample = `
@@ -38,31 +37,18 @@ func main() {
 	sum := 0
 	for _, game := range games {
 		moves := bRe.FindAllStringSubmatch(game, -1)
-		a1, b1, a2, b2 := util.MustFloat(moves[0][1]), util.MustFloat(moves[0][2]), util.MustFloat(moves[1][1]), util.MustFloat(moves[1][2])
+		ax, ay, bx, by := util.MustFloat(moves[0][1]), util.MustFloat(moves[0][2]), util.MustFloat(moves[1][1]), util.MustFloat(moves[1][2])
 		prize := pRe.FindAllStringSubmatch(game, -1)
-		c1, c2 := util.MustFloat(prize[0][1]), util.MustFloat(prize[0][2])
+		x, y := util.MustFloat(prize[0][1]), util.MustFloat(prize[0][2])
 
-		A := mat.NewDense(2, 2, []float64{a1, a2, b1, b2})
-		b := mat.NewVecDense(2, []float64{c1, c2})
+		A := (bx*y - by*x) / (bx*ay - by*ax)
+		B := (x - ax*A) / bx
 
-		var x mat.VecDense
-		if err := x.SolveVec(A, b); err != nil {
-			panic(err)
+		if A == math.Trunc(A) && B == math.Trunc(B) {
+			a := int(A)
+			b := int(B)
+			sum += a*3 + b
 		}
-		aTimes := -1
-		bTimes := -1
-		if x.AtVec(0) == math.Trunc(x.AtVec(0)) {
-			aTimes = int(x.AtVec(0))
-		}
-		if x.AtVec(1) == math.Trunc(x.AtVec(1)) {
-			bTimes = int(x.AtVec(1))
-		}
-		if aTimes > 100 || bTimes > 100 || aTimes < 0 || bTimes < 0 {
-			continue
-		}
-
-		fmt.Printf("%d %d\n", aTimes*3, bTimes)
-		sum += aTimes*3 + bTimes
 	}
 
 	fmt.Printf("%v\n", sum)
