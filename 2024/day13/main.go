@@ -41,6 +41,10 @@ func main() {
 		prize := pRe.FindAllStringSubmatch(game, -1)
 		x, y := util.MustFloat(prize[0][1]), util.MustFloat(prize[0][2])
 
+		// comment for pt 1
+		x += 10000000000000
+		y += 10000000000000
+
 		A := (bx*y - by*x) / (bx*ay - by*ax)
 		B := (x - ax*A) / bx
 
