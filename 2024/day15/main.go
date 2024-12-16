@@ -22,23 +22,34 @@ const sample = `
 
 type robot struct {
 	x, y int
+	m    [][]byte
 }
 
-var m [][]byte
-
 func main() {
-	in := util.ParseInput("")
+	in := util.ParseInput(sample)
 	parts := strings.Split(in, "\n\n")
 	mstring := strings.Split(parts[0], "\n")
+	var m [][]byte
+	var w [][]byte
 	for i, s := range mstring {
 		m = append(m, []byte{})
+		w = append(w, []byte{})
 		m[i] = append(m[i], []byte(s)...)
+		for _, ch := range s {
+			if ch == 'O' {
+				w[i] = append(w[i], []byte{'[', ']'}...)
+			} else if ch == '@' {
+				w[i] = append(w[i], []byte{'@', '.'}...)
+			} else {
+				w[i] = append(w[i], []byte{byte(ch), byte(ch)}...)
+			}
+		}
 	}
 	moves := parts[1]
 
-	r := &robot{-1, -1}
+	r := &robot{-1, -1, w}
 
-	for y, line := range m {
+	for y, line := range r.m {
 		for x, ch := range line {
 			if ch == '@' {
 				r.x = x
@@ -60,7 +71,7 @@ func main() {
 		case 'v':
 			r.moveDown()
 		}
-		// printMap()
+		r.printMap()
 	}
 
 	sum := 0
@@ -78,8 +89,8 @@ func (r *robot) moveLeft() {
 	// check for open space left of char
 	openSpace := false
 	i := r.x - 1
-	for ; m[r.y][i] != '#'; i-- {
-		if m[r.y][i] == '.' {
+	for ; r.m[r.y][i] != '#'; i-- {
+		if r.m[r.y][i] == '.' {
 			openSpace = true
 			break
 		}
@@ -88,12 +99,12 @@ func (r *robot) moveLeft() {
 	if openSpace {
 		// everything right of this space should shift
 		for j := i; j < r.x; j++ {
-			m[r.y][j] = m[r.y][j+1]
+			r.m[r.y][j] = r.m[r.y][j+1]
 		}
 
 		// move player
 		r.x--
-		m[r.y][r.x+1] = '.'
+		r.m[r.y][r.x+1] = '.'
 	}
 }
 
@@ -101,8 +112,8 @@ func (r *robot) moveRight() {
 	// check for open space right of char
 	openSpace := false
 	i := r.x + 1
-	for ; m[r.y][i] != '#'; i++ {
-		if m[r.y][i] == '.' {
+	for ; r.m[r.y][i] != '#'; i++ {
+		if r.m[r.y][i] == '.' {
 			openSpace = true
 			break
 		}
@@ -111,12 +122,12 @@ func (r *robot) moveRight() {
 	if openSpace {
 		// everything left of this space should shift
 		for j := i; j > r.x; j-- {
-			m[r.y][j] = m[r.y][j-1]
+			r.m[r.y][j] = r.m[r.y][j-1]
 		}
 
 		// move player
 		r.x++
-		m[r.y][r.x-1] = '.'
+		r.m[r.y][r.x-1] = '.'
 	}
 }
 
@@ -124,8 +135,8 @@ func (r *robot) moveUp() {
 	// check for open space above char
 	openSpace := false
 	i := r.y - 1
-	for ; m[i][r.x] != '#'; i-- {
-		if m[i][r.x] == '.' {
+	for ; r.m[i][r.x] != '#'; i-- {
+		if r.m[i][r.x] == '.' {
 			openSpace = true
 			break
 		}
@@ -134,12 +145,12 @@ func (r *robot) moveUp() {
 	if openSpace {
 		// everything below this space should shift
 		for j := i; j < r.y; j++ {
-			m[j][r.x] = m[j+1][r.x]
+			r.m[j][r.x] = r.m[j+1][r.x]
 		}
 
 		// move player
 		r.y--
-		m[r.y+1][r.x] = '.'
+		r.m[r.y+1][r.x] = '.'
 	}
 }
 
@@ -147,8 +158,8 @@ func (r *robot) moveDown() {
 	// check for open space below char
 	openSpace := false
 	i := r.y + 1
-	for ; m[i][r.x] != '#'; i++ {
-		if m[i][r.x] == '.' {
+	for ; r.m[i][r.x] != '#'; i++ {
+		if r.m[i][r.x] == '.' {
 			openSpace = true
 			break
 		}
@@ -157,19 +168,19 @@ func (r *robot) moveDown() {
 	if openSpace {
 		// everything above this space should shift
 		for j := i; j > r.y; j-- {
-			m[j][r.x] = m[j-1][r.x]
+			r.m[j][r.x] = r.m[j-1][r.x]
 		}
 
 		// move player
 		r.y++
-		m[r.y-1][r.x] = '.'
+		r.m[r.y-1][r.x] = '.'
 	}
 }
 
-func printMap() {
-	for y := range m {
-		for x := range m[y] {
-			fmt.Printf("%c", m[y][x])
+func (r *robot) printMap() {
+	for y := range r.m {
+		for x := range r.m[y] {
+			fmt.Printf("%c", r.m[y][x])
 		}
 		fmt.Println()
 	}
